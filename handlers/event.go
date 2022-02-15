@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -78,17 +79,32 @@ func findListener(event models.Event, listenerCols *mongo.Collection) ([]models.
 		}
 	}
 
+	// activity to filter
+	activityPart := strings.Split(event.Activity, ";")
+	activityFilter := []bson.M{}
+	for i := range activityPart {
+		activityFilter = append(activityFilter, bson.M{
+			"activity": strings.Join(activityPart[0:i+1], ";"),
+		})
+	}
+
 	curr, err := listenerCols.Find(context.TODO(), bson.M{
-		"activity": event.Activity,
-		"$or": []bson.M{
+		"$and": []bson.M{
 			{
-				"metadataFilter.accountIds.0": bson.M{
-					"$exists": false,
-				},
+				"$or": activityFilter,
 			},
 			{
-				"metadataFilter.accountIds": bson.M{
-					"$all": accountIds,
+				"$or": []bson.M{
+					{
+						"metadataFilter.accountIds.0": bson.M{
+							"$exists": false,
+						},
+					},
+					{
+						"metadataFilter.accountIds": bson.M{
+							"$all": accountIds,
+						},
+					},
 				},
 			},
 		},
@@ -101,6 +117,8 @@ func findListener(event models.Event, listenerCols *mongo.Collection) ([]models.
 		return res, err
 	}
 
+	println(len(res))
+
 	return res, nil
 }
 
@@ -110,7 +128,7 @@ func publishEvent(
 ) (*models.TriggerLog, error) {
 	// log
 	log := listener.ToTriggerLog()
-	log.Event = event
+	log.EventId = event.Id
 
 	if _, err := logCols.InsertOne(context.TODO(), log); err != nil {
 		return nil, err

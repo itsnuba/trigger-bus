@@ -20,7 +20,7 @@ type TriggerLog struct {
 	HandledMessage    *string             `bson:"handledMessage" json:"handledMessage"`
 
 	// event
-	Event Event `bson:"event" json:"event"`
+	EventId primitive.ObjectID `bson:"_eventId" json:"eventId"`
 }
 
 func MakeTriggerLog() TriggerLog {

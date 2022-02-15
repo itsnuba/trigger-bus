@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PORT=8080 ENVIRONMENT=local ./bin/air
+PORT=8900 ENVIRONMENT=local ./bin/air
