@@ -54,6 +54,8 @@ func InitValidator(v *validator.Validate) {
 	// regis custom validator
 	v.RegisterValidation(activitiFormatS, validateActivityFormat)
 	v.RegisterTranslation(activitiFormatS, t, regisActivityFormatTranslation, translateActivityFormat)
+	v.RegisterValidation(metadataFilterFormatS, validateMetadataFilterFormat)
+	v.RegisterTranslation(metadataFilterFormatS, t, regisMetadataFilterFormatTranslation, translateMetadataFilterFormat)
 }
 
 func TranslateValidationError(err error, additionalMessage ...string) responses.ApiErrorResponse {

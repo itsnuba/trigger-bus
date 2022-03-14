@@ -26,12 +26,20 @@ type addTriggerListenerQueryParam struct {
 	AllowDuplicate bool `form:"allow_duplicate"`
 }
 
-type editTriggerListenerParam struct {
+type getTriggerListenerParam struct {
 	// path
 	Id string `uri:"id" binding:"required,hexadecimal,len=24"`
+}
+
+type editTriggerListenerParam struct {
+	getTriggerListenerParam
 
 	// query
 	AllowDuplicate bool `form:"allow_duplicate"`
+}
+
+type deleteTriggerListenerParam struct {
+	getTriggerListenerParam
 }
 
 func getTriggerListener(cols *mongo.Collection, filter bson.M) *models.TriggerListener {
@@ -70,6 +78,33 @@ func GetTriggerListenerListHandler(c *gin.Context, cols *mongo.Collection) {
 		}
 	} else {
 		panic(err)
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
+func GetTriggerListenerByIdHandler(c *gin.Context, cols *mongo.Collection) {
+	var param getTriggerListenerParam
+	if err := c.ShouldBindUri(&param); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			validators.TranslateValidationError(err, "cannot parse path parameter"),
+		)
+		return
+	}
+
+	id, err := primitive.ObjectIDFromHex(param.Id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			responses.MakeApiErrorResponse("cannot parse id", err.Error()),
+		)
+	}
+
+	data := getTriggerListener(cols, bson.M{"_id": id})
+	if data == nil {
+		c.AbortWithStatusJSON(http.StatusNotFound,
+			responses.MakeApiErrorResponse("not found"),
+		)
+		return
 	}
 
 	c.JSON(http.StatusOK, data)
@@ -177,6 +212,37 @@ func EditTriggerListenerHandler(c *gin.Context, cols *mongo.Collection) {
 	}
 
 	if _, err := cols.ReplaceOne(context.TODO(), bson.M{"_id": id}, data); err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
+func DeleteTriggerListenerHandler(c *gin.Context, cols *mongo.Collection) {
+	var param deleteTriggerListenerParam
+	if err := c.ShouldBindUri(&param); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			validators.TranslateValidationError(err, "cannot parse path parameter"),
+		)
+		return
+	}
+
+	id, err := primitive.ObjectIDFromHex(param.Id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			responses.MakeApiErrorResponse("cannot parse id", err.Error()),
+		)
+	}
+
+	data := getTriggerListener(cols, bson.M{"_id": id})
+	if data == nil {
+		c.AbortWithStatusJSON(http.StatusNotFound,
+			responses.MakeApiErrorResponse("not found"),
+		)
+		return
+	}
+
+	if _, err := cols.DeleteOne(context.TODO(), bson.M{"_id": id}); err != nil {
 		panic(err)
 	}
 

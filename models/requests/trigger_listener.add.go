@@ -13,7 +13,7 @@ type TriggerListenerAddConverter interface {
 type TriggerListenerAddForm struct {
 	Activity          string                        `json:"activity" binding:"required,activityFormat"`
 	CallbackUrl       string                        `json:"callbackUrl" binding:"required,url"`
-	MetadataFilter    TriggerListenerMetadataFilter `json:"metadataFilter" binding:"required"`
+	MetadataFilter    TriggerListenerMetadataFilter `json:"metadataFilter" binding:"required,metadataFilterFormat"`
 	HandlingParameter bson.M                        `bson:"handlingParameter" binding:"required"`
 }
 
@@ -23,7 +23,7 @@ func (f *TriggerListenerAddForm) FromTriggerListener(i models.TriggerListener) e
 
 	// metadata
 	f.MetadataFilter = TriggerListenerMetadataFilter{}
-	f.MetadataFilter.FromBsonM(i.MetadataFilter)
+	f.MetadataFilter = i.MetadataFilter
 
 	// handling parameter
 	f.HandlingParameter = i.HandlingParameter
@@ -38,12 +38,7 @@ func (f TriggerListenerAddForm) ToTriggerListener() (models.TriggerListener, err
 	o.HandlingParameter = f.HandlingParameter
 
 	// metadata
-	o.MetadataFilter = bson.M{}
-	if d, err := f.MetadataFilter.ToBsonM(); err == nil {
-		o.MetadataFilter = d
-	} else {
-		return o, err
-	}
+	o.MetadataFilter = f.MetadataFilter
 
 	// handling parameter
 	o.HandlingParameter = f.HandlingParameter

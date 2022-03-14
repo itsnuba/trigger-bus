@@ -12,9 +12,9 @@ type TriggerListener struct {
 	BaseCreatable `bson:",inline"`
 	BaseModifable `bson:",inline"`
 
-	Activity          string `bson:"activity" json:"activity"`
-	MetadataFilter    bson.M `bson:"metadataFilter" json:"metadata"`
-	HandlingParameter bson.M `bson:"handlingParameter" json:"handlingParameter"`
+	Activity          string            `bson:"activity" json:"activity"`
+	MetadataFilter    map[string]bson.A `bson:"metadataFilter" json:"metadataFilter"`
+	HandlingParameter bson.M            `bson:"handlingParameter" json:"handlingParameter"`
 
 	Active      bool   `bson:"active" json:"active"`
 	CallbackUrl string `bson:"callbackUrl" json:"callbackUrl"`

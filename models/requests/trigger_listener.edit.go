@@ -13,7 +13,7 @@ type TriggerListenerEditForm struct {
 	Activity          *string                        `json:"activity" binding:"omitempty,activityFormat"`
 	CallbackUrl       *string                        `json:"callbackUrl" binding:"omitempty,url"`
 	Active            *bool                          `json:"active"`
-	MetadataFilter    *TriggerListenerMetadataFilter `json:"metadataFilter"`
+	MetadataFilter    *TriggerListenerMetadataFilter `json:"metadataFilter" binding:"omitempty,metadataFilterFormat"`
 	HandlingParameter *bson.M                        `bson:"handlingParameter"`
 }
 
@@ -31,11 +31,7 @@ func (f TriggerListenerEditForm) ApplyToTriggerListener(o *models.TriggerListene
 		o.HandlingParameter = *f.HandlingParameter
 	}
 	if f.MetadataFilter != nil {
-		if d, err := f.MetadataFilter.ToBsonM(); err == nil {
-			o.MetadataFilter = d
-		} else {
-			return err
-		}
+		o.MetadataFilter = *f.MetadataFilter
 	}
 
 	return nil

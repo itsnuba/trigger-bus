@@ -72,13 +72,6 @@ func AddEventHandler(c *gin.Context, eventCols *mongo.Collection, listenerCols *
 func findListener(event models.Event, listenerCols *mongo.Collection) ([]models.TriggerListener, error) {
 	res := []models.TriggerListener{}
 
-	accountIds := []int{}
-	if v, ok := event.Metadata["accountId"]; ok {
-		if id, ok := v.(float64); ok {
-			accountIds = append(accountIds, int(id))
-		}
-	}
-
 	// activity to filter
 	activityPart := strings.Split(event.Activity, ";")
 	activityFilter := []bson.M{}
@@ -88,26 +81,33 @@ func findListener(event models.Event, listenerCols *mongo.Collection) ([]models.
 		})
 	}
 
-	curr, err := listenerCols.Find(context.TODO(), bson.M{
-		"$and": []bson.M{
-			{
-				"$or": activityFilter,
-			},
-			{
-				"$or": []bson.M{
-					{
-						"metadataFilter.accountIds.0": bson.M{
-							"$exists": false,
-						},
+	// metadata filter
+	metadataFilters := []bson.M{}
+	for k, v := range event.Metadata {
+		mk := "metadataFilter." + k
+		mf := bson.M{
+			"$or": []bson.M{
+				{
+					mk + ".0": bson.M{
+						"$exists": false,
 					},
-					{
-						"metadataFilter.accountIds": bson.M{
-							"$all": accountIds,
-						},
+				},
+				{
+					mk: bson.M{
+						"$all": bson.A{v},
 					},
 				},
 			},
-		},
+		}
+		metadataFilters = append(metadataFilters, mf)
+	}
+
+	curr, err := listenerCols.Find(context.TODO(), bson.M{
+		"$and": append([]bson.M{
+			{
+				"$or": activityFilter,
+			},
+		}, metadataFilters...),
 	})
 	if err != nil {
 		return res, err

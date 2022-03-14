@@ -32,8 +32,14 @@ func setupRouter(r *gin.Engine) {
 		g.POST("", func(c *gin.Context) {
 			handlers.AddTriggerListenerHandler(c, dbCollections.triggerListeners)
 		})
+		g.GET("/:id", func(c *gin.Context) {
+			handlers.GetTriggerListenerByIdHandler(c, dbCollections.triggerListeners)
+		})
 		g.PUT("/:id", func(c *gin.Context) {
 			handlers.EditTriggerListenerHandler(c, dbCollections.triggerListeners)
+		})
+		g.DELETE("/:id", func(c *gin.Context) {
+			handlers.DeleteTriggerListenerHandler(c, dbCollections.triggerListeners)
 		})
 	}
 
