@@ -30,6 +30,7 @@ func MakeTriggerListener() TriggerListener {
 
 func (v *TriggerListener) ToTriggerLog() TriggerLog {
 	o := MakeTriggerLog()
+	o.TriggerType = TLETEvent
 	o.TriggerListenerId = &v.Id
 	o.CallbackUrl = v.CallbackUrl
 	o.HandlingParameter = v.HandlingParameter

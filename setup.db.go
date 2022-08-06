@@ -15,6 +15,7 @@ var (
 	dbCollections struct {
 		events           *mongo.Collection
 		triggerListeners *mongo.Collection
+		triggerScheduler *mongo.Collection
 		triggerLogs      *mongo.Collection
 	}
 )
@@ -47,5 +48,6 @@ func setupDB() {
 	dbClient = client
 	dbCollections.events = client.Database(config.MongoDB).Collection(config.MongoColEvent)
 	dbCollections.triggerListeners = client.Database(config.MongoDB).Collection(config.MongoColTriggerListener)
+	dbCollections.triggerScheduler = client.Database(config.MongoDB).Collection(config.MongoColTriggerScheduler)
 	dbCollections.triggerLogs = client.Database(config.MongoDB).Collection(config.MongoColTriggerLog)
 }

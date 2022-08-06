@@ -8,3 +8,7 @@ import (
 func SendEventToEventChannel(event models.Event) {
 	queue.EventChannel <- event
 }
+
+func SendSchedulerToSchedulerChannel(sch models.TriggerScheduler) {
+	queue.SchedulerChannel <- sch
+}

@@ -6,9 +6,17 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/itsnuba/trigger-bus/handlers"
+	m "github.com/itsnuba/trigger-bus/handlers/middlewares"
 )
 
 func setupRouter(r *gin.Engine) {
+	h := handlers.MakeHandler(
+		dbClient,
+		dbCollections.events,
+		dbCollections.triggerListeners,
+		dbCollections.triggerScheduler,
+		dbCollections.triggerLogs,
+	)
 
 	// CORS
 	r.Use(cors.Default())
@@ -49,6 +57,18 @@ func setupRouter(r *gin.Engine) {
 		g.PUT("", func(c *gin.Context) {
 			c.JSON(http.StatusOK, "")
 		})
+	}
+
+	// trigger scheduler
+	{
+		g := r.Group("/trigger_schedulers")
+		g.GET("", h.GetTriggerScheduler)
+		g.POST("", h.PostTriggerScheduler)
+
+		gId := g.Group("/:id", m.GetResourceId)
+		gId.GET("", h.GetTriggerSchedulerById)
+		gId.PUT("", h.PutTriggerSchedulerById)
+		gId.DELETE("", h.DeleteTriggerListenerById)
 	}
 
 }

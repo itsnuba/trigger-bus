@@ -56,6 +56,8 @@ func InitValidator(v *validator.Validate) {
 	v.RegisterTranslation(activitiFormatS, t, regisActivityFormatTranslation, translateActivityFormat)
 	v.RegisterValidation(metadataFilterFormatS, validateMetadataFilterFormat)
 	v.RegisterTranslation(metadataFilterFormatS, t, regisMetadataFilterFormatTranslation, translateMetadataFilterFormat)
+	v.RegisterValidation(cronExprFormatS, validateCronExprFormat)
+	v.RegisterTranslation(cronExprFormatS, t, regisCronExprFormatTranslation, translateCronExprFormat)
 }
 
 func TranslateValidationError(err error, additionalMessage ...string) responses.ApiErrorResponse {
