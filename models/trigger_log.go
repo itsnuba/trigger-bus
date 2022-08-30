@@ -11,7 +11,7 @@ type TrigglerLogTriggerType string
 
 var (
 	TLETEvent     TrigglerLogTriggerType = "event"
-	TLETScheduler TrigglerLogTriggerType = "shceduler"
+	TLETScheduler TrigglerLogTriggerType = "scheduler"
 )
 
 type TriggerLog struct {
